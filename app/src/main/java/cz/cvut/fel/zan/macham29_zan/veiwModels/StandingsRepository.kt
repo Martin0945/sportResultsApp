@@ -28,7 +28,7 @@ object StandingsRepository {
 
     private suspend fun loadMockDataToDb() {
         val fakeData = listOf(
-            TeamStanding(1, 1, "Sparta Praha", 30, 76), // Přidal jsem na začátek každého řádku ID
+            TeamStanding(1, 1, "Sparta Praha", 30, 76),
             TeamStanding(2, 2, "Slavia Praha", 30, 72),
             TeamStanding(3, 3, "Viktoria Plzeň", 30, 62),
             TeamStanding(4, 4, "Baník Ostrava", 30, 45),

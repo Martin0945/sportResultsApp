@@ -1,5 +1,7 @@
 package cz.cvut.fel.zan.macham29_zan
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -20,6 +22,7 @@ import cz.cvut.fel.zan.macham29_zan.screens.ResultsScreen
 import cz.cvut.fel.zan.macham29_zan.screens.SettingsScreen
 import cz.cvut.fel.zan.macham29_zan.screens.TableScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainApp() {
     val navController = rememberNavController()
