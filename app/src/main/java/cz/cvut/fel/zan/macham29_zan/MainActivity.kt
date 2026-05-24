@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import cz.cvut.fel.zan.macham29_zan.api.SettingsDataStore
 import cz.cvut.fel.zan.macham29_zan.database.AppDatabase
 import cz.cvut.fel.zan.macham29_zan.ui.theme.Macham29ZANTheme
 import cz.cvut.fel.zan.macham29_zan.veiwModels.MatchRepository
@@ -17,8 +18,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val database = AppDatabase.getDatabase(this)
-        MatchRepository.initialize(database.matchDao())
-        StandingsRepository.initialize(database.teamStandingDao())
+        val dataStore = SettingsDataStore(this)
+        MatchRepository.initialize(database.matchDao(), dataStore)
+        StandingsRepository.initialize(database.teamStandingDao(), dataStore)
 
         enableEdgeToEdge()
         setContent {

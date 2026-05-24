@@ -11,5 +11,6 @@ data class TeamStanding(
     val position: Int,
     val teamName: String,
     val numMatches: Int,
-    val points: Int
+    val points: Int,
+    val crest: String
 )

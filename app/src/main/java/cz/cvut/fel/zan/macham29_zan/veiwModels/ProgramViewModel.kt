@@ -1,10 +1,10 @@
 package cz.cvut.fel.zan.macham29_zan.veiwModels
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cz.cvut.fel.zan.macham29_zan.veiwModels.MatchRepository
 import cz.cvut.fel.zan.macham29_zan.dataClasses.Match
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,8 +23,8 @@ class ProgramViewModel : ViewModel(){
 
     fun updateSearchText(newText: String) { _searchText.value = newText }
 
-    fun toggleFavorite(match: Match) {
-        MatchRepository.toggleFavorite(match)
+    fun toggleFavorite(context: Context, match: Match) {
+        MatchRepository.toggleFavorite(context, match)
     }
 
 }

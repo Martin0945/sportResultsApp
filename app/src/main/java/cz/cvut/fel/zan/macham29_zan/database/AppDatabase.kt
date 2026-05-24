@@ -9,14 +9,13 @@ import cz.cvut.fel.zan.macham29_zan.database.DateConverter
 import cz.cvut.fel.zan.macham29_zan.dataClasses.Match
 import cz.cvut.fel.zan.macham29_zan.dataClasses.TeamStanding
 
-
 @Database(entities = [Match::class, TeamStanding::class], version = 2, exportSchema = false)
 @TypeConverters(DateConverter::class)
-abstract class AppDatabase: RoomDatabase(){
+abstract class AppDatabase : RoomDatabase() {
     abstract fun matchDao(): MatchDao
-    abstract fun teamStandingDao() : TeamStandingDao
+    abstract fun teamStandingDao(): TeamStandingDao
 
-    companion object{
+    companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -26,8 +25,7 @@ abstract class AppDatabase: RoomDatabase(){
                     context.applicationContext,
                     AppDatabase::class.java,
                     "league_database"
-                ).fallbackToDestructiveMigration(true)
-                .build()
+                ).build()
                 INSTANCE = instance
                 instance
             }

@@ -2,6 +2,7 @@ package cz.cvut.fel.zan.macham29_zan.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
@@ -29,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.cvut.fel.zan.macham29_zan.veiwModels.ProgramViewModel
@@ -50,13 +55,14 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProgramScreen(programViewModel: ProgramViewModel = viewModel()){
+fun ProgramScreen(programViewModel: ProgramViewModel = viewModel(), onMatchClick: (Int) -> Unit){
     val matchList by programViewModel.matches.collectAsState()
     val searchText by programViewModel.searchText.collectAsState()
 
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
 
     val focusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
 
     LaunchedEffect(isSearchActive) {
         if (isSearchActive) {
@@ -64,7 +70,7 @@ fun ProgramScreen(programViewModel: ProgramViewModel = viewModel()){
         }
     }
 
-    val limitDays = LocalDate.now().plusDays(7)
+    val limitDays = LocalDate.now().plusMonths(5)
 
     val filteredMatches = matchList.filter { match ->
         val containsMatches = match.teams.contains(searchText, ignoreCase = true)
@@ -74,8 +80,12 @@ fun ProgramScreen(programViewModel: ProgramViewModel = viewModel()){
     }
 
     val groupedMatches = filteredMatches.groupBy { it.date }
+    val sortedMatches = groupedMatches.mapValues { (_, matches) ->
+        matches.sortedBy { it.time }
+    }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -84,11 +94,13 @@ fun ProgramScreen(programViewModel: ProgramViewModel = viewModel()){
                             value = searchText,
                             onValueChange = { programViewModel.updateSearchText(it) },
                             placeholder = { Text("Search for team...") },
-                            modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+                            modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).padding(bottom = 8.dp),
+                            shape = RoundedCornerShape(8.dp),
                             singleLine = true,
                             colors = TextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                focusedContainerColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                focusedTextColor = Color.Black
                             )
                         )
                     } else {
@@ -104,10 +116,15 @@ fun ProgramScreen(programViewModel: ProgramViewModel = viewModel()){
                     }) {
                         Icon(
                             imageVector = if (isSearchActive) Icons.Default.Close else Icons.Default.Search,
-                            contentDescription = "Search"
+                            contentDescription = "Search",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                )
             )
         }
     ) { paddingValues ->
@@ -116,22 +133,26 @@ fun ProgramScreen(programViewModel: ProgramViewModel = viewModel()){
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp)
             ) {
-                groupedMatches.toSortedMap().forEach { (date, matchesForDate) ->
+                sortedMatches.toSortedMap().forEach { (date, matchesForDate) ->
                     item {
                         Text(
                             text = formatHeaderDate(date),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 10.dp, bottom = 8.dp, start = 4.dp),
                         )
                     }
 
                     items(matchesForDate) {match ->
                         Card(
                             modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            onClick = { onMatchClick(match.id) },
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFF161A22),
+                            ),
+                            border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary)
                         ){
-
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -140,9 +161,10 @@ fun ProgramScreen(programViewModel: ProgramViewModel = viewModel()){
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = match.teams,
+                                    text = match.teams.replace(" - ", "\n"),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
+                                    color = MaterialTheme.colorScheme.onPrimary
                                 )
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
@@ -155,16 +177,17 @@ fun ProgramScreen(programViewModel: ProgramViewModel = viewModel()){
                                     } else if (match.time != null) {
                                         Text(
                                             text = match.time,
-                                            style = MaterialTheme.typography.bodyMedium
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onPrimary
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(4.dp))
 
-                                    IconButton(onClick = { programViewModel.toggleFavorite(match) }) {
+                                    IconButton(onClick = { programViewModel.toggleFavorite(context,match) }) {
                                         Icon(
                                             imageVector = if (match.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                             contentDescription = "Add to favorites",
-                                            tint = if (match.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                            tint = if (match.isFavorite) Color.Red else MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
