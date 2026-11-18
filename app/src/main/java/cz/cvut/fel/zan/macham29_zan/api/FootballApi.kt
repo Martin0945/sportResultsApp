@@ -5,12 +5,12 @@ import retrofit2.http.Header
 import retrofit2.http.Path
 
 interface FootballApi {
-    @GET("v4/competitions/BSA/matches")
+    @GET("v4/competitions/PL/matches")
     suspend fun getMatches(
         @Header("X-Auth-Token") token: String
     ): MatchResponse
 
-    @GET("v4/competitions/BSA/standings")
+    @GET("v4/competitions/PL/standings")
     suspend fun getStandings(
         @Header("X-Auth-Token") token: String
     ): StandingsResponse

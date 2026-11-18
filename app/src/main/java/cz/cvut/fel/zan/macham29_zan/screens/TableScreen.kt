@@ -45,7 +45,7 @@ fun TableScreen(tableViewModel: TableViewModel = viewModel()){
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {Text(text = "Campeonato Brasileiro Série A")},
+                title = {Text(text = "Premier League")},
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -104,8 +104,7 @@ fun TableScreen(tableViewModel: TableViewModel = viewModel()){
                             val zoneColor = when (team.position) {
                                 in 1..4 -> Color.Blue
                                 5 -> Color.Magenta
-                                in 6 .. 11 -> Color.Yellow
-                                in 17..20 -> Color(0xFFF44336)
+                                in 18 .. 20 -> Color.Red
                                 else -> Color.Transparent
                             }
 
